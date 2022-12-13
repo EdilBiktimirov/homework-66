@@ -1,21 +1,13 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {MealsType, MealType} from "../../types";
-import MealCard from "../../components/MealCard/MealCard";
+import React, {useCallback, useEffect, useState} from 'react';
 import axiosApi from "../../axiosApi";
+import MealCard from "../../components/MealCard/MealCard";
 import Spinner from "../../components/Spinner/Spinner";
-
-// interface Props {
-//   meals: MealType[];
-// }
+import type {MealsType, MealType} from "../../types";
 
 const Home: React.FC = () => {
-  // const navigate = useNavigate();
-
-
   const [meals, setMeals] = useState<MealType[]>([]);
   const [mealId, setMealId] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  // const [deleting, setDeleting] = useState(false);
 
   const fetchMeals = useCallback(async () => {
     try {
@@ -29,26 +21,21 @@ const Home: React.FC = () => {
           meal.id = elem;
           return meal;
         });
-
         setMeals(newMeals);
       }
     } finally {
       setLoading(false);
     }
-
   }, [])
-
 
   const deleteMeal = async (id: string) => {
     try {
       setMealId(id);
-      // setDeleting(true);
       await axiosApi.delete('/meals/' + id + '.json');
       setMeals([]);
       await fetchMeals().catch(console.error);
-    } finally {
-      // setDeleting(false);
-      // navigate('/')
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -58,16 +45,13 @@ const Home: React.FC = () => {
     }, 0);
   };
 
-
   useEffect(() => {
-    void fetchMeals();
+    fetchMeals().catch(console.error);
   }, [fetchMeals]);
 
-
   return (
-    <div>
+    <div className="p-2">
       <p>{'Total calories: ' + getCalories()}</p>
-
       {loading ? <Spinner/> : meals.map((elem) => (
         <MealCard
           title={elem.name}

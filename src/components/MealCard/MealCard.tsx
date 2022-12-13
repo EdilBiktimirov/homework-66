@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link} from "react-router-dom";
-
 import ButtonSpinner from "../Spinner/ButtonSpinner";
 
 interface Props {
@@ -22,17 +21,24 @@ const MealCard: React.FC<Props> = ({
                                    }) => {
 
   return (
-    <div className="card d-flex justify-content-between">
+    <div className="card d-flex justify-content-between p-2 flex-row mb-2 shadow-sm align-items-center">
       <div>
-        <p>{title}</p>
-        <p>{text}</p>
+        <p className='fw-bold'>{title}</p>
+        <p className="fst-italic">{text}</p>
+        <span className="fw-lighter">calories: {amount}</span>
       </div>
-      <div>
-        <span>{amount}</span>
-        <Link to={'meals/' + id + '/edit'} className="btn btn-success" aria-disabled={isLoading}>Edit</Link>
-        <button className="btn btn-danger" onClick={onDeleteClick} disabled={isLoading}>
+      <div className='w-25 d-flex flex-column'>
+        <Link
+          to={'meals/' + id + '/edit'}
+          className="btn btn-outline-dark mb-2"
+          aria-disabled={isLoading}>Edit</Link>
+        <button
+          className="btn btn-outline-danger"
+          onClick={onDeleteClick}
+          disabled={isLoading}>
           {isLoading && <ButtonSpinner/>}
-          Delete</button>
+          Delete
+        </button>
       </div>
     </div>
   );

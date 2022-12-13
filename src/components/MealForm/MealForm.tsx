@@ -1,9 +1,8 @@
 import React, {FormEvent, useState} from 'react';
-import {MealTypeMutation} from "../../types";
 import axiosApi from "../../axiosApi";
 import {useNavigate, useParams} from "react-router-dom";
-
 import ButtonSpinner from "../Spinner/ButtonSpinner";
+import type {MealTypeMutation} from "../../types";
 
 interface Props {
   existingMeal?: MealTypeMutation;
@@ -13,7 +12,6 @@ const MEALS: string[] = ['breakfast', 'snack', 'lunch', 'dinner'];
 
 const MealForm: React.FC<Props> = ({existingMeal}) => {
   const [creating, setCreating] = useState(false);
-
 
   const {id} = useParams();
   const navigate = useNavigate();
@@ -33,7 +31,7 @@ const MealForm: React.FC<Props> = ({existingMeal}) => {
       ...prev,
       [name]: value
     }))
-  }
+  };
 
   const onFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -45,22 +43,22 @@ const MealForm: React.FC<Props> = ({existingMeal}) => {
       } finally {
         setCreating(false);
       }
-
     } else {
       try {
         setCreating(true);
         await axiosApi.post('/meals.json', meal);
-
       } finally {
         setCreating(false);
         navigate('/');
       }
     }
-  }
+  };
 
 
   return (
-    <form onSubmit={onFormSubmit}>
+    <form
+      onSubmit={onFormSubmit}
+      className="p-2">
       <select
         className="form-select my-2 w-75"
         id={"page"}
@@ -73,26 +71,26 @@ const MealForm: React.FC<Props> = ({existingMeal}) => {
           <option value={elem} key={Math.random()}>{elem}</option>
         ))}
       </select>
-
       <input
         className="form-control my-2 w-75"
         name={'text'}
         type="text"
         value={meal.text}
         onChange={onMealChange}
+        placeholder="Description:"
       />
-
       <input
         className="form-control my-2 w-25"
         name={'amount'}
         type="number"
         value={meal.amount}
         onChange={onMealChange}
+        placeholder="Calories:"
       />
-
-      <button type="submit" className="btn btn-primary" disabled={creating}>
+      <button type="submit" className="btn btn-outline-info" disabled={creating}>
         {creating && <ButtonSpinner/>}
-        Save</button>
+        Save
+      </button>
     </form>
   );
 };
