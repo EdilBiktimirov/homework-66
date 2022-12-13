@@ -1,48 +1,34 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import MealCard from "./components/MealCard/MealCard";
-import MealForm from "./components/MealForm/MealForm";
-import {MealsType, MealType} from "./types";
-import axiosApi from "./axiosApi";
+import React from 'react';
 import {Link, Route, Routes} from "react-router-dom";
 import Home from "./containers/Home/Home";
+import CreateEditMeal from "./containers/CreateEditMeal/CreateEditMeal";
 
 function App() {
+  // const location = useLocation();
 
-  const [meals, setMeals] = useState<MealType[]>([]);
 
-  const fetchMeals = useCallback(async () => {
-    const response = await axiosApi.get<MealsType| null>('/meals.json');
-    const responseMeals = response.data;
-    console.log(response.data)
 
-    if (responseMeals!== null) {
-      const newMeals = Object.keys(responseMeals).map((elem) => {
-          const meal = responseMeals[elem];
-          meal.id = elem;
-          return meal;
-      });
-
-      setMeals(newMeals);
-      // console.log(meals);
-    }
-
-  }, [])
-
-  useEffect(() => {
-    void fetchMeals();
-  }, [fetchMeals]);
 
 
   return (
     <div className="App">
       <Link to={'/'}>Calories tracker</Link>
+      <Link to={'/add-meal'}>Add new Meal</Link>
       <Routes>
         <Route path={'/'} element={(
-          <Home meals={meals}/>
+          <Home/>
+        )}/>
+        {/*<Route path={'/meals'} element={(*/}
+        {/*  <Home meals={meals}/>*/}
+        {/*)}/>*/}
+        <Route path={'/add-meal'} element={(
+          <CreateEditMeal/>
         )}/>
         <Route path={'meals/:id/edit'} element={(
-          <MealForm isEdit/>
+          <CreateEditMeal isEdit/>
         )}/>
+
+        <Route path={'*'} element={<h3>Not found</h3>}/>
       </Routes>
 
     </div>

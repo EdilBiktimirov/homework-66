@@ -1,24 +1,30 @@
 import React, {FormEvent, useState} from 'react';
-import {MealsType, MealTypeMutation} from "../../types";
+import {MealTypeMutation} from "../../types";
 import axiosApi from "../../axiosApi";
-import {useParams} from "react-router-dom";
-import {isElement} from "react-dom/test-utils";
+import {useNavigate, useParams} from "react-router-dom";
+
+import ButtonSpinner from "../Spinner/ButtonSpinner";
 
 interface Props {
-  isEdit?: boolean;
+  existingMeal?: MealTypeMutation;
 }
 
 const MEALS: string[] = ['breakfast', 'snack', 'lunch', 'dinner'];
 
-const MealForm:React.FC<Props> = ({isEdit}) => {
+const MealForm: React.FC<Props> = ({existingMeal}) => {
+  const [creating, setCreating] = useState(false);
+
+
   const {id} = useParams();
-
-
-  const [meal, setMeal] = useState<MealTypeMutation>({
+  const navigate = useNavigate();
+  const initialState = existingMeal ? {
+    ...existingMeal
+  } : {
     name: '',
     text: '',
     amount: '',
-  });
+  }
+  const [meal, setMeal] = useState<MealTypeMutation>(initialState);
 
   const onMealChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const {name, value} = e.target;
@@ -32,17 +38,24 @@ const MealForm:React.FC<Props> = ({isEdit}) => {
   const onFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (isEdit) {
-      const response = await axiosApi.get<MealsType | null>('/meals/' + id + '.json');
-      console.log(response.data);
+    if (id) {
+      try {
+        setCreating(true);
+        await axiosApi.put('/meals/' + id + '.json', meal)
+      } finally {
+        setCreating(false);
+      }
+
+    } else {
+      try {
+        setCreating(true);
+        await axiosApi.post('/meals.json', meal);
+
+      } finally {
+        setCreating(false);
+        navigate('/');
+      }
     }
-
-    try {
-      await axiosApi.post('/meals.json', meal)
-    } finally {
-
-    }
-
   }
 
 
@@ -75,9 +88,11 @@ const MealForm:React.FC<Props> = ({isEdit}) => {
         type="number"
         value={meal.amount}
         onChange={onMealChange}
-        />
+      />
 
-      <button type="submit" className="btn btn-primary">Save</button>
+      <button type="submit" className="btn btn-primary" disabled={creating}>
+        {creating && <ButtonSpinner/>}
+        Save</button>
     </form>
   );
 };
